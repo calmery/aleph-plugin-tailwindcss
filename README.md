@@ -4,7 +4,7 @@
 [![Lint](https://github.com/calmery-chan/aleph-plugin-tailwindcss/actions/workflows/lint.yml/badge.svg?branch=develop)](https://github.com/calmery-chan/aleph-plugin-tailwindcss/actions/workflows/lint.yml)
 [![Commitizen Friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
-A plugin for using :woman_singer: with Aleph.js.
+A plugin for using Tailwind CSS with Aleph.js.
 
 ## Installation
 
