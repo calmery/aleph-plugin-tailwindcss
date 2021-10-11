@@ -6,76 +6,84 @@ import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
 
 type Aleph = Parameters<Plugin["setup"]>[0] & { config: RequiredConfig };
 
-// Constants
+// Helper Functions
 
-const baseDir = new URL(".", import.meta.url).pathname;
-const nodeDir = path.resolve(baseDir, "./node/");
+const watch = async (filePath: string, callback: (string: string) => void) => {
+  const watcher = Deno.watchFs(filePath);
+
+  for await (const event of watcher) {
+    if (event.kind === "modify") {
+      callback(
+        new TextDecoder().decode(await Deno.readFile(filePath)),
+      );
+    }
+  }
+};
 
 // State
 
-const styles: { [key: string]: string } = {};
-
-// Helper Functions
-
-const webpack = (aleph: Aleph, options: {
-  watch: boolean;
-}) => {
-  return Deno.run({
-    cmd: [
-      "npx",
-      "webpack",
-      "--config",
-      path.resolve(nodeDir, "./webpack.config.js"),
-    ].concat(options.watch ? ["--watch"] : []),
-    env: {
-      _ALEPH_PLUGIN_EMOTION_BASE_DIRECTORY: baseDir,
-      _ALEPH_PLUGIN_EMOTION_MODE: aleph.mode,
-      _ALEPH_PLUGIN_EMOTION_SOURCE_DIRECTORY: path.resolve(
-        aleph.workingDir,
-        `.${aleph.config.srcDir}`,
-      ),
-      _ALEPH_PLUGIN_EMOTION_WORKING_DIRECTORY: aleph.workingDir,
-    },
-    stderr: "null",
-    stdout: "null",
-  }).status();
-};
+let style = "";
 
 // Main
 
 export default <Plugin> {
-  name: "emotion",
-  async setup(
-    aleph: Aleph,
-  ) {
-    await webpack(aleph, { watch: false });
+  name: "tailwindcss",
+  async setup(aleph: Aleph) {
+    const inputFilePath = await Deno.makeTempFile();
+    const outputFilePath = await Deno.makeTempFile();
+
+    // Input
+
+    await Deno.writeFile(
+      inputFilePath,
+      new TextEncoder().encode(`
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+      `),
+    );
 
     // Events
 
-    aleph.onTransform(/\/pages\/.+.tsx$/, async ({ module: { specifier } }) => {
-      const css = new TextDecoder().decode(
-        await Deno.run({
-          cmd: [
-            "node",
-            path.resolve(nodeDir, "./output/", `./${specifier}.js`),
-          ],
-          stdout: "piped",
-        }).output(),
-      );
-
-      styles[specifier] = css;
-    });
-
     aleph.onRender(({ html }) => {
-      html.head.push(
-        `<style data-emotion>${Object.values(styles).join("")}</style>`,
-      );
+      html.head.push(`<style>${style}</style>`);
     });
 
-    // In development mode
+    // Helper Functions
+
+    const build = (options: { watch: boolean }) => {
+      return Deno.run({
+        cmd: [
+          "npx",
+          "tailwindcss",
+          "build",
+          "--input",
+          inputFilePath,
+          "--output",
+          outputFilePath,
+          "--purge",
+          path.resolve(
+            aleph.workingDir,
+            `.${aleph.config.srcDir}`,
+            "./**/*.tsx",
+          ),
+        ].concat(
+          aleph.mode === "production" ? ["--minify"] : [],
+          options.watch ? ["--watch"] : [],
+        ),
+        stdout: "null",
+        stderr: "null",
+      });
+    };
+
+    // Main
+
+    await build({ watch: false }).status();
+    style = new TextDecoder().decode(await Deno.readFile(outputFilePath));
 
     if (aleph.mode === "development") {
-      webpack(aleph, { watch: true });
+      watch(outputFilePath, (string) => style = string);
+      build({ watch: true });
     }
   },
 };
