@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "fmt": "deno fmt --config ./deno.json",
+    "lint": "deno lint --config ./deno.json"
+  }
+}
