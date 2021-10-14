@@ -1,0 +1,24 @@
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.14.3
+      - uses: actions/setup-node@v2
+        with:
+          cache: npm
+          node-version: "16.11.0"
+      - run: "deno run -A https://deno.land/x/aleph/install.ts"
+      - run: "npm ci"
+      - run: "cd ./example/"
+      - run: "npm ci"
+      - run: "aleph build"
+
+name: Build
+
+on:
+  push:
+    branches-ignore:
+      - main
