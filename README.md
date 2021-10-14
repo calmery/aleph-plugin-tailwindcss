@@ -14,7 +14,7 @@ Please install Node.js and run it.
 // aleph.config.ts
 
 import type { Config } from "https://deno.land/x/aleph@v0.3.0-beta.19/types.d.ts";
-import tailwindcss from "https://deno.land/x/calmery_chan_aleph_plugin_tailwindcss@v1.1.1/mod.ts";
+import tailwindcss from "https://deno.land/x/calmery_chan_aleph_plugin_tailwindcss/plugin.ts";
 
 export default <Config> {
   plugins: [tailwindcss],
