@@ -5,9 +5,6 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "dependencies": {
-    "tailwindcss": "2.2.16"
-  },
   "description": "A plugin for using Tailwind CSS with Aleph.js",
   "devDependencies": {
     "@semantic-release/git": "10.0.0",
