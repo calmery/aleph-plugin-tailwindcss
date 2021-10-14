@@ -1,5 +1,6 @@
 import type { Plugin } from "https://deno.land/x/aleph@v0.3.0-beta.19/types.d.ts";
 import type { RequiredConfig } from "https://deno.land/x/aleph@v0.3.0-beta.19/server/config.ts";
+import * as colors from "https://deno.land/std@0.110.0/fmt/colors.ts";
 import * as fs from "https://deno.land/std@0.110.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
 
@@ -8,6 +9,10 @@ import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
 type Aleph = Parameters<Plugin["setup"]>[0] & { config: RequiredConfig };
 
 // Helper Functions
+
+const log = (...messages: string[]) => {
+  console.log(colors.blue("Tailwind CSS"), ...messages);
+};
 
 const watch = async (filePath: string, callback: (string: string) => void) => {
   const watcher = Deno.watchFs(filePath);
@@ -36,6 +41,7 @@ export default <Plugin> {
     );
 
     if (!(await fs.exists(tailwindConfigJs))) {
+      log("The process was aborted because tailwind.config.js does not exist.");
       return;
     }
 
@@ -57,6 +63,7 @@ export default <Plugin> {
 
     aleph.onRender(({ html, path }) => {
       html.head.push(`<style>${style}</style>`);
+      log("render", path);
     });
 
     // Helper Functions
@@ -93,6 +100,7 @@ export default <Plugin> {
     if (aleph.mode === "development") {
       watch(outputFilePath, (string) => style = string);
       build({ watch: true });
+      log("Start watching code changes...");
     }
   },
 };
