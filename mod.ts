@@ -1,5 +1,6 @@
 import type { Plugin } from "https://deno.land/x/aleph@v0.3.0-beta.19/types.d.ts";
 import type { RequiredConfig } from "https://deno.land/x/aleph@v0.3.0-beta.19/server/config.ts";
+import * as fs from "https://deno.land/std@0.110.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
 
 // Types
@@ -29,10 +30,19 @@ let style = "";
 export default <Plugin> {
   name: "tailwindcss",
   async setup(aleph: Aleph) {
-    const inputFilePath = await Deno.makeTempFile();
-    const outputFilePath = await Deno.makeTempFile();
+    const tailwindConfigJs = path.resolve(
+      aleph.workingDir,
+      "./tailwind.config.js",
+    );
+
+    if (!(await fs.exists(tailwindConfigJs))) {
+      return;
+    }
 
     // Input
+
+    const inputFilePath = await Deno.makeTempFile();
+    const outputFilePath = await Deno.makeTempFile();
 
     await Deno.writeFile(
       inputFilePath,
@@ -45,7 +55,7 @@ export default <Plugin> {
 
     // Events
 
-    aleph.onRender(({ html }) => {
+    aleph.onRender(({ html, path }) => {
       html.head.push(`<style>${style}</style>`);
     });
 
@@ -54,19 +64,18 @@ export default <Plugin> {
     const build = (options: { watch: boolean }) => {
       return Deno.run({
         cmd: [
-          "npx",
-          "tailwindcss",
+          "npm",
+          "exec",
+          "--yes",
+          "--",
+          "tailwindcss@2.2.17",
           "build",
+          "--config",
+          tailwindConfigJs,
           "--input",
           inputFilePath,
           "--output",
           outputFilePath,
-          "--purge",
-          path.resolve(
-            aleph.workingDir,
-            `.${aleph.config.srcDir}`,
-            "./**/*.tsx",
-          ),
         ].concat(
           aleph.mode === "production" ? ["--minify"] : [],
           options.watch ? ["--watch"] : [],
