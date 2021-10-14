@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@calmery-chan/aleph-plugin-tailwindcss": "file:..",
     "@tailwindcss/typography": "0.4.1"
   }
 }
