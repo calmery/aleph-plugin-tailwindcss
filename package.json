@@ -19,8 +19,7 @@
     "npm": "^8.0.0"
   },
   "files": [
-    "mod.ts",
-    "node"
+    "plugin.ts"
   ],
   "homepage": "https://github.com/calmery-chan/aleph-plugin-tailwindcss#readme",
   "license": "MIT",
