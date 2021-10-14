@@ -1,12 +1,24 @@
 {
   "fmt": {
     "files": {
-      "exclude": ["./.git/", "./node_modules/"]
+      "exclude": [
+        "./.git/",
+        "./example/.aleph/",
+        "./example/dist/",
+        "./example/node_modules/",
+        "./node_modules/"
+      ]
     }
   },
   "lint": {
     "files": {
-      "exclude": ["./.git/", "./node_modules/"]
+      "exclude": [
+        "./.git/",
+        "./example/.aleph/",
+        "./example/dist/",
+        "./example/node_modules/",
+        "./node_modules/"
+      ]
     }
   }
 }
