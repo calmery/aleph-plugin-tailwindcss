@@ -75,7 +75,7 @@ export default <Plugin> {
           "exec",
           "--yes",
           "--",
-          "tailwindcss@2.2.17",
+          "tailwindcss@3.0.7",
           "build",
           "--config",
           tailwindConfigJs,
