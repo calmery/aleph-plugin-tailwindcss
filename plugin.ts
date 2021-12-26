@@ -118,6 +118,7 @@ const tailwindcss = ({ version }: PluginOptions): Plugin => {
             aleph.mode === "production" ? ["--minify"] : [],
             options.watch ? ["--watch"] : [],
           ),
+          cwd: aleph.workingDir,
           stdout: "null",
           stderr: "null",
         });
