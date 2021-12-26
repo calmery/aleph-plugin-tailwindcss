@@ -42,13 +42,28 @@ interface PluginOptions {
 }
 
 const tailwindcss = ({ version }: PluginOptions): Plugin => {
-  if (version && !semver.validRange(version)) {
-    throw new Error("Invalid version");
-  }
-
   return {
     name: "tailwindcss",
     async setup(aleph: Aleph) {
+      // Check if this plugin is compatible with the current version of npm.
+
+      const npmVersion = new TextDecoder().decode(
+        await (await Deno.run({ cmd: ["npm", "--version"], stdout: "piped" }))
+          .output(),
+      ).replace(/\r?\n/g, "");
+
+      if (!semver.gt(npmVersion, "7.0.0")) {
+        throw new Error("This plugin requires npm version 7.0.0 or higher.");
+      }
+
+      //
+
+      if (version && !semver.validRange(version)) {
+        throw new Error("Invalid version.");
+      }
+
+      //
+
       const tailwindConfigJs = path.resolve(
         aleph.workingDir,
         "./tailwind.config.js",
