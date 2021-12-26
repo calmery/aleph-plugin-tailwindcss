@@ -1,8 +1,13 @@
 import type { Plugin } from "https://deno.land/x/aleph@v0.3.0-beta.19/types.d.ts";
 import type { RequiredConfig } from "https://deno.land/x/aleph@v0.3.0-beta.19/server/config.ts";
+import * as semver from "https://deno.land/x/semver@v1.4.0/mod.ts";
 import * as colors from "https://deno.land/std@0.110.0/fmt/colors.ts";
 import * as fs from "https://deno.land/std@0.110.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
+
+// Constants
+
+const DEFAULT_VERSION = "^3.0.7";
 
 // Types
 
@@ -32,75 +37,92 @@ let style = "";
 
 // Main
 
-export default <Plugin> {
-  name: "tailwindcss",
-  async setup(aleph: Aleph) {
-    const tailwindConfigJs = path.resolve(
-      aleph.workingDir,
-      "./tailwind.config.js",
-    );
+interface PluginOptions {
+  version?: string;
+}
 
-    if (!(await fs.exists(tailwindConfigJs))) {
-      log("The process was aborted because tailwind.config.js does not exist.");
-      return;
-    }
+const tailwindcss = ({ version }: PluginOptions): Plugin => {
+  if (version && !semver.validRange(version)) {
+    throw new Error("Invalid version");
+  }
 
-    // Input
+  return {
+    name: "tailwindcss",
+    async setup(aleph: Aleph) {
+      const tailwindConfigJs = path.resolve(
+        aleph.workingDir,
+        "./tailwind.config.js",
+      );
 
-    const inputFilePath = await Deno.makeTempFile();
-    const outputFilePath = await Deno.makeTempFile();
+      if (!(await fs.exists(tailwindConfigJs))) {
+        log(
+          "The process was aborted because tailwind.config.js does not exist.",
+        );
+        return;
+      }
 
-    await Deno.writeFile(
-      inputFilePath,
-      new TextEncoder().encode(`
+      // Input
+
+      const inputFilePath = await Deno.makeTempFile();
+      const outputFilePath = await Deno.makeTempFile();
+
+      await Deno.writeFile(
+        inputFilePath,
+        new TextEncoder().encode(`
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
       `),
-    );
+      );
 
-    // Events
+      // Events
 
-    aleph.onRender(({ html, path }) => {
-      html.head.push(`<style>${style}</style>`);
-      log("render", path);
-    });
-
-    // Helper Functions
-
-    const build = (options: { watch: boolean }) => {
-      return Deno.run({
-        cmd: [
-          "npm",
-          "exec",
-          "--yes",
-          "--",
-          "tailwindcss@3.0.7",
-          "build",
-          "--config",
-          tailwindConfigJs,
-          "--input",
-          inputFilePath,
-          "--output",
-          outputFilePath,
-        ].concat(
-          aleph.mode === "production" ? ["--minify"] : [],
-          options.watch ? ["--watch"] : [],
-        ),
-        stdout: "null",
-        stderr: "null",
+      aleph.onRender(({ html, path }) => {
+        html.head.push(`<style>${style}</style>`);
+        log("render", path);
       });
-    };
 
-    // Main
+      // Helper Functions
 
-    await build({ watch: false }).status();
-    style = new TextDecoder().decode(await Deno.readFile(outputFilePath));
+      const build = (options: { watch: boolean }) => {
+        return Deno.run({
+          cmd: [
+            "npm",
+            "exec",
+            "--yes",
+            "--",
+            `tailwindcss@${version ?? DEFAULT_VERSION}`,
+            "build",
+            "--config",
+            tailwindConfigJs,
+            "--input",
+            inputFilePath,
+            "--output",
+            outputFilePath,
+          ].concat(
+            aleph.mode === "production" ? ["--minify"] : [],
+            options.watch ? ["--watch"] : [],
+          ),
+          stdout: "null",
+          stderr: "null",
+        });
+      };
 
-    if (aleph.mode === "development") {
-      watch(outputFilePath, (string) => style = string);
-      build({ watch: true });
-      log("Start watching code changes...");
-    }
-  },
+      // Main
+
+      await build({ watch: false }).status();
+      style = new TextDecoder().decode(await Deno.readFile(outputFilePath));
+
+      if (aleph.mode === "development") {
+        watch(outputFilePath, (string) => style = string);
+        build({ watch: true });
+        log("Start watching code changes...");
+      }
+    },
+  };
 };
+
+const defaultConfiguration = tailwindcss({ version: DEFAULT_VERSION });
+tailwindcss.setup = defaultConfiguration.setup;
+
+export default tailwindcss;
