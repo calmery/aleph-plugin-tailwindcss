@@ -18,6 +18,7 @@ import tailwindcss from "https://deno.land/x/calmery_chan_aleph_plugin_tailwindc
 
 export default <Config> {
   plugins: [tailwindcss],
+  // plugins: [tailwindcss({ version: "3.0.18" })],
 };
 ```
 
@@ -25,7 +26,7 @@ export default <Config> {
 // tailwind.config.js
 
 module.exports = {
-  purge: ["./src/**/*.tsx"],
+  content: ["./src/**/*.tsx"],
 };
 ```
 
