@@ -1,13 +1,13 @@
 import type { Plugin } from "https://deno.land/x/aleph@v0.3.0-beta.19/types.d.ts";
 import type { RequiredConfig } from "https://deno.land/x/aleph@v0.3.0-beta.19/server/config.ts";
 import * as semver from "https://deno.land/x/semver@v1.4.0/mod.ts";
-import * as colors from "https://deno.land/std@0.110.0/fmt/colors.ts";
-import * as fs from "https://deno.land/std@0.110.0/fs/mod.ts";
-import * as path from "https://deno.land/std@0.110.0/path/mod.ts";
+import * as colors from "https://deno.land/std@0.125.0/fmt/colors.ts";
+import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
+import * as path from "https://deno.land/std@0.125.0/path/mod.ts";
 
 // Constants
 
-const DEFAULT_VERSION = "^3.0.7";
+const DEFAULT_VERSION = "^3.0.18";
 
 // Types
 
