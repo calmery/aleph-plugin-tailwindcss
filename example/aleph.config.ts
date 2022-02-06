@@ -9,3 +9,8 @@ export default <Config> {
 // export default <Config> {
 //   plugins: [tailwindcss({ version: "3.0.18" })],
 // };
+
+// If it does not work properly, try running it with the following option.
+// export default <Config> {
+//   plugins: [tailwindcss({ verbose: true })],
+// };

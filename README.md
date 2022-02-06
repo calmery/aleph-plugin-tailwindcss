@@ -19,7 +19,7 @@ import tailwindcss from "https://deno.land/x/aleph_plugin_tailwindcss/plugin.ts"
 
 export default <Config> {
   plugins: [tailwindcss],
-  // plugins: [tailwindcss({ version: "3.0.18" })],
+  // plugins: [tailwindcss({ verbose: true, version: "3.0.18" })],
 };
 ```
 

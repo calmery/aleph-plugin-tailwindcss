@@ -38,10 +38,11 @@ let style = "";
 // Main
 
 interface PluginOptions {
+  verbose?: boolean;
   version?: string;
 }
 
-const tailwindcss = ({ version }: PluginOptions): Plugin => {
+const tailwindcss = ({ verbose = false, version }: PluginOptions): Plugin => {
   return {
     name: "tailwindcss",
     async setup(aleph: Aleph) {
@@ -119,8 +120,8 @@ const tailwindcss = ({ version }: PluginOptions): Plugin => {
             options.watch ? ["--watch"] : [],
           ),
           cwd: aleph.workingDir,
-          stdout: "null",
-          stderr: "null",
+          stdout: verbose ? undefined : "null",
+          stderr: verbose ? undefined : "null",
         });
       };
 
