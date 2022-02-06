@@ -1,11 +1,9 @@
 {
-  "author": "Calmery <contact@calmery.me> (https://calmery.me/)",
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
   },
-  "description": "A plugin for using Tailwind CSS with Aleph.js",
   "devDependencies": {
     "@semantic-release/git": "10.0.1",
     "commitizen": "4.2.4",
@@ -18,16 +16,9 @@
     "node": ">=17.4.0 <18.0.0",
     "npm": ">=8.4.1 <9.0.0"
   },
-  "files": [
-    "plugin.ts"
-  ],
-  "homepage": "https://github.com/calmery-chan/aleph-plugin-tailwindcss#readme",
-  "license": "MIT",
   "lint-staged": {
     "**/*.{json,md,ts,tsx}": "vr fmt"
   },
-  "main": "./node/index.js",
-  "name": "@calmery-chan/aleph-plugin-tailwindcss",
   "packageManager": "npm@8.4.1",
   "release": {
     "branches": [
@@ -40,9 +31,7 @@
       "@semantic-release/github"
     ]
   },
-  "repository": "github:calmery-chan/aleph-plugin-tailwindcss",
   "scripts": {
     "prepare": "husky install"
-  },
-  "version": "3.2.0"
+  }
 }
