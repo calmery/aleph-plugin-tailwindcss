@@ -46,10 +46,12 @@ const tailwindcss = ({ verbose = false, version }: PluginOptions): Plugin => {
   return {
     name: "tailwindcss",
     async setup(aleph: Aleph) {
+      const npm = Deno.build.os === "windows" ? "npm.cmd" : "npm";
+
       // Check if this plugin is compatible with the current version of npm.
 
       const npmVersion = new TextDecoder().decode(
-        await (await Deno.run({ cmd: ["npm", "--version"], stdout: "piped" }))
+        await (await Deno.run({ cmd: [npm, "--version"], stdout: "piped" }))
           .output(),
       ).replace(/\r?\n/g, "");
 
@@ -103,7 +105,7 @@ const tailwindcss = ({ verbose = false, version }: PluginOptions): Plugin => {
       const build = (options: { watch: boolean }) => {
         return Deno.run({
           cmd: [
-            "npm",
+            npm,
             "exec",
             "--yes",
             "--",
